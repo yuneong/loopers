@@ -22,7 +22,7 @@ class UserTest {
         @ParameterizedTest
         @ValueSource(strings = {
                 "아이디윤영",
-                "loopers123",
+                "loopers1234",
                 "loopers!@#",
                 "윤영loopers!@#123",
                 " "
@@ -35,7 +35,7 @@ class UserTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                User.save(userId, gender, birth, email);
+                User.create(userId, gender, birth, email);
             });
         }
 
@@ -56,7 +56,7 @@ class UserTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                User.save(userId, gender, birth, email);
+                User.create(userId, gender, birth, email);
             });
         }
 
@@ -67,7 +67,7 @@ class UserTest {
                 "1999.08.21",
                 "1999-08-32",
                 "1999-13-01",
-                "2023-08-21",
+                "3025-08-21",
         })
         void throwsIllegalArgumentException_whenBirthIsInvalid(String birth) {
             // given
@@ -77,7 +77,7 @@ class UserTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                User.save(
+                User.create(
                         userId,
                         gender,
                         birth,
