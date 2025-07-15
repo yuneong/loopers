@@ -12,9 +12,9 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User signUp(String userId, UserCommand command) {
+    public User signUp(UserCommand command) {
         // command -> domain
-        User user = UserCommand.toDomain(userId, command);
+        User user = UserCommand.toDomain(command);
         // repository
         return userRepository.save(user);
     }

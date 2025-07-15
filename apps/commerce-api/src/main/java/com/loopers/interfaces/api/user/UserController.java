@@ -15,14 +15,11 @@ public class UserController implements UserV1ApiSpec {
 
     @PostMapping("")
     @Override
-    public UserV1Dto.UserResponse singUp(
-            @RequestHeader("X-USER-ID") String userId,
-            @RequestBody UserV1Dto.UserRequest request
-    ) {
+    public UserV1Dto.UserResponse singUp(@RequestBody UserV1Dto.UserRequest request) {
         // request -> command
         UserCommand command = UserV1Dto.UserRequest.toCommand(request);
         // service
-        UserInfo userInfo = userFacade.signUp(userId, command);
+        UserInfo userInfo = userFacade.signUp(command);
         // result -> response
         return UserV1Dto.UserResponse.from(userInfo);
     }

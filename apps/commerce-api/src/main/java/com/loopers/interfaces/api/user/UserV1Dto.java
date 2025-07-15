@@ -6,6 +6,7 @@ import com.loopers.application.user.UserInfo;
 public class UserV1Dto {
 
     public record UserRequest(
+            String userId,
             String gender,
             String birth,
             String email
@@ -13,6 +14,7 @@ public class UserV1Dto {
 
         public static UserCommand toCommand(UserRequest request) {
             return new UserCommand(
+                    request.userId,
                     request.gender,
                     request.birth,
                     request.email
