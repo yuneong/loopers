@@ -1,10 +1,11 @@
 package com.loopers.application.user;
 
+import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.User;
 
 public record UserCommand(
         String userId,
-        String gender,
+        Gender gender,
         String birth,
         String email
 ) {

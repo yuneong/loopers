@@ -46,7 +46,7 @@ class UserServiceIntegrationTest {
             // given
             UserCommand command = new UserCommand(
                     "oyy",
-                    "FEMALE",
+                    Gender.F,
                     "1999-08-21",
                     "loopers@gmail.com"
             );
@@ -65,7 +65,7 @@ class UserServiceIntegrationTest {
             // given
             UserCommand command = new UserCommand(
                     "oyy",
-                    "FEMALE",
+                    Gender.F,
                     "1999-08-21",
                     "loopers@gmail.com"
             );

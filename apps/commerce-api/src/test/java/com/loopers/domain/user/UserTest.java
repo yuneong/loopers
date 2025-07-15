@@ -29,7 +29,7 @@ class UserTest {
         })
         void throwsIllegalArgumentException_whenUserIdIsInvalid(String userId) {
             // given
-            String gender = "FEMALE";
+            Gender gender = Gender.F;
             String birth = "1999-08-21";
             String email = "loopers@gmail.com";
 
@@ -51,7 +51,7 @@ class UserTest {
         void throwsIllegalArgumentException_whenEmailIsInvalid(String email) {
             // given
             String userId = "loopers";
-            String gender = "FEMALE";
+            Gender gender = Gender.F;
             String birth = "1999-08-21";
 
             // when & then
@@ -72,7 +72,7 @@ class UserTest {
         void throwsIllegalArgumentException_whenBirthIsInvalid(String birth) {
             // given
             String userId = "oyy";
-            String gender = "FEMALE";
+            Gender gender = Gender.F;
             String email = "loopers@gmail.com";
 
             // when & then
