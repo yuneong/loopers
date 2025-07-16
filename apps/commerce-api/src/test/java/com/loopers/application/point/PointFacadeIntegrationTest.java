@@ -1,5 +1,8 @@
 package com.loopers.application.point;
 
+import com.loopers.application.user.UserCommand;
+import com.loopers.domain.user.Gender;
+import com.loopers.domain.user.UserService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -17,6 +21,9 @@ class PointFacadeIntegrationTest {
 
     @Autowired
     private PointFacade pointFacade;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -44,9 +51,60 @@ class PointFacadeIntegrationTest {
                 pointFacade.charge(command);
             });
 
-            assertEquals(ErrorType.USER_NOT_FOUND, exception.getErrorType());
+            assertAll(
+                    () -> assertThat(exception.getMessage()).isEqualTo("존재하지 않는 유저 ID 입니다."),
+                    () -> assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND)
+            );
         }
 
+    }
+
+    /**
+     * - [x]  해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.
+     * - [x]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
+     */
+    @DisplayName("포인트 조회 시,")
+    @Nested
+    class getPoint {
+
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.")
+        @Test
+        void returnsBalance_whenUserExistsByUserId() {
+            // given
+            String userId = "oyy";
+            UserCommand command = new UserCommand(
+                    userId,
+                    Gender.F,
+                    "1999-08-21",
+                    "loopers@gmail.com"
+            );
+            userService.signUp(command);
+            pointFacade.charge(new PointCommand("oyy", 500L));
+
+            // when
+            PointInfo pointInfo = pointFacade.getPoint(userId);
+
+            // then
+            assertAll(
+                    () -> assertThat(pointInfo).isNotNull(),
+                    () -> assertThat(pointInfo.userId()).isEqualTo(userId),
+                    () -> assertThat(pointInfo.balance()).isGreaterThanOrEqualTo(0L)
+            );
+        }
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @Test
+        void returnsNull_whenUserDoesNotExist() {
+            // given
+            String userId = "oyy";
+
+            // when
+            PointInfo pointInfo = pointFacade.getPoint(userId);
+
+            // then
+            assertThat(pointInfo).isNull();
+            assertThat(pointInfo).isEqualTo(null);
+        }
     }
 
 }

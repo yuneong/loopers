@@ -28,13 +28,11 @@ public class PointFacade {
     }
 
     public PointInfo getPoint(String userId) {
-        // validation user exists
-        if (!userService.existsByUserId(userId)) {
-            throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 유저 ID 입니다.");
-        }
-
         // service
         Point point = pointService.getPoint(userId);
+        if (point == null) {
+            return null;
+        }
         // domain -> result
         return PointInfo.from(point);
     }
