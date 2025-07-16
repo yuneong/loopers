@@ -13,10 +13,20 @@ public class UserService {
 
     @Transactional
     public User signUp(UserCommand command) {
+        // validation existsByUserId
+        String userId = command.userId();
+        if (existsByUserId(command.userId())) {
+            throw new IllegalArgumentException("User already exists with userId: " + userId);
+        }
+
         // command -> domain
         User user = UserCommand.toDomain(command);
         // repository
         return userRepository.save(user);
+    }
+
+    public boolean existsByUserId(String userId) {
+        return userRepository.existsByUserId(userId);
     }
 
 }
