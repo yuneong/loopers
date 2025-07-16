@@ -30,8 +30,7 @@ public class UserService {
     }
 
     public User getMyInfo(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with userId: " + userId));
+        return userRepository.findByUserId(userId).orElse(null);
     }
 
 }

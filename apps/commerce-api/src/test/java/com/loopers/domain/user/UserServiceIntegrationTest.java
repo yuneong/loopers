@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -77,4 +79,53 @@ class UserServiceIntegrationTest {
             });
         }
     }
+
+    /**
+     * - [x]  해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.
+     * - [x]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
+     */
+    @DisplayName("회원 정보 조회 시,")
+    @Nested
+    class getMyInfo {
+
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+        @Test
+        void returnsMyInfo_whenUserExists() {
+            // given
+            UserCommand command = new UserCommand(
+                    "oyy",
+                    Gender.F,
+                    "1999-08-21",
+                    "loopers@gmail.com"
+            );
+            User user = userService.signUp(command);
+
+            // when
+            User findUser = userService.getMyInfo(user.getUserId());
+
+            // then
+            assertAll(
+                    () -> assertThat(findUser).isNotNull(),
+                    () -> assertThat(findUser.getUserId()).isEqualTo(user.getUserId()),
+                    () -> assertThat(findUser.getGender()).isEqualTo(user.getGender()),
+                    () -> assertThat(findUser.getBirth()).isEqualTo(user.getBirth()),
+                    () -> assertThat(findUser.getEmail()).isEqualTo(user.getEmail())
+            );
+        }
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @Test
+        void returnsNull_whenUserDoesNotExist() {
+            // given
+            String userId = UUID.randomUUID().toString(); // 존재하지 않을만한 ID 생성
+
+            // when
+            User findUser = userService.getMyInfo(userId);
+
+            // then
+            assertThat(findUser).isNull();
+            assertThat(findUser).isEqualTo(null);
+        }
+    }
+
 }
