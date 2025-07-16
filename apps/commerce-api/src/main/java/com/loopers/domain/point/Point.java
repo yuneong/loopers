@@ -19,11 +19,21 @@ public class Point extends BaseEntity {
             long amount
     ) {
         Point point = new Point();
+
+        // 유효성 검사
+        point.validateChargeAmount(amount);
+
         point.userId = userId;
         point.amount = amount;
         point.balance += amount; // 충전 시 잔액 증가
 
         return point;
+    }
+
+    public void validateChargeAmount(long amount) {
+        if (amount <= 0L) {
+            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+        }
     }
 
 }
