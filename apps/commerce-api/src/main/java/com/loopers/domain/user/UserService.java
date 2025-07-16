@@ -29,4 +29,9 @@ public class UserService {
         return userRepository.existsByUserId(userId);
     }
 
+    public User getMyInfo(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with userId: " + userId));
+    }
+
 }
