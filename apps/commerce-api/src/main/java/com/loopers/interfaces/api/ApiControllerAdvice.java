@@ -123,6 +123,11 @@ public class ApiControllerAdvice {
         return failureResponse(ErrorType.BAD_REQUEST, errorMessage);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handleNullPoint(NullPointerException e) {
+        return failureResponse(ErrorType.NOT_FOUND, null);
+    }
+
     private String extractMissingParameter(String message) {
         Pattern pattern = Pattern.compile("'(.+?)'");
         Matcher matcher = pattern.matcher(message);
