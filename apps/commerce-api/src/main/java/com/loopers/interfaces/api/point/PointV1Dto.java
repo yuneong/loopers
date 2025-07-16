@@ -31,4 +31,17 @@ public class PointV1Dto {
         }
     }
 
+    // 포인트 조회
+    public record FindResponse(
+            String userId,
+            long balance
+    ) {
+        public static FindResponse from(PointInfo info) {
+            return new FindResponse(
+                    info.userId(),
+                    info.balance()
+            );
+        }
+    }
+
 }

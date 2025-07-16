@@ -28,4 +28,15 @@ public class PointController implements PointV1ApiSpec {
         return ApiResponse.success(response);
     }
 
+    @GetMapping("")
+    @Override
+    public ApiResponse<PointV1Dto.FindResponse> getPoint(@RequestHeader("X-USER-ID") String userId) {
+        // service
+        PointInfo pointInfo = pointFacade.getPoint(userId);
+        // result -> response
+        PointV1Dto.FindResponse response = PointV1Dto.FindResponse.from(pointInfo);
+
+        return ApiResponse.success(response);
+    }
+
 }

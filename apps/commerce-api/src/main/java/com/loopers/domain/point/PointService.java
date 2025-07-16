@@ -19,4 +19,9 @@ public class PointService {
         return pointRepository.charge(point);
     }
 
+    public Point getPoint(String userId) {
+        // repository
+        return pointRepository.findByUserId(userId).orElse(null);
+    }
+
 }
