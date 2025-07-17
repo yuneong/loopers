@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -113,4 +110,71 @@ public class PointV1ApiE2ETest {
         }
     }
 
+    /**
+     * - [x]  포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.
+     * - [x]  `X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.
+     */
+    @DisplayName("GET /api/v1/points")
+    @Nested
+    class getPoint {
+
+        @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
+        @Test
+        void returnsPoint_whenUserExists() {
+            // given
+            UserV1Dto.UserRequest userRequest = new UserV1Dto.UserRequest(
+                    "oyy",
+                    Gender.F,
+                    "1999-08-21",
+                    "loopers@gmail.com"
+            );
+            testRestTemplate.postForEntity(ENDPOINT_USER, userRequest, void.class);
+
+            PointV1Dto.chargeRequest chargeRequest = new PointV1Dto.chargeRequest("oyy", 700L);
+            testRestTemplate.postForEntity(ENDPOINT + "/charge", chargeRequest, void.class);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", "oyy");
+
+            ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>>() {};
+
+            // when
+            ResponseEntity<ApiResponse<PointV1Dto.FindResponse>> response = testRestTemplate.exchange(
+                    ENDPOINT,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    responseType
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(response.getStatusCode().is2xxSuccessful()).isTrue(),
+                    () -> assertThat(response.getBody()).isNotNull(),
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(700L)
+            );
+        }
+
+        @DisplayName("`X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.")
+        @Test
+        void throwsBadRequest_whenUserIdIsNotInHeader() {
+            // given
+            HttpHeaders headers = new HttpHeaders();
+            ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>>() {};
+
+            // when
+            ResponseEntity<ApiResponse<PointV1Dto.FindResponse>> response = testRestTemplate.exchange(
+                    ENDPOINT,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    responseType
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(response.getStatusCode().is4xxClientError()).isTrue(),
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                    () -> assertThat(response.getBody().meta().result()).isEqualTo(ApiResponse.Metadata.Result.FAIL)
+            );
+        }
+    }
 }
