@@ -60,14 +60,20 @@ public class PointV1ApiE2ETest {
             );
             testRestTemplate.postForEntity(ENDPOINT_USER, userRequest, void.class);
 
-            PointV1Dto.chargeRequest request = new PointV1Dto.chargeRequest("oyy", 1000L);
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.chargeResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.chargeResponse>>() {};
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", "oyy");
+
+            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(1000L);
+
+            HttpEntity<PointV1Dto.ChargeRequest> httpEntity = new HttpEntity<>(chargeRequest, headers);
+
+            ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>>() {};
 
             // when
-            ResponseEntity<ApiResponse<PointV1Dto.chargeResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<PointV1Dto.ChargeResponse>> response = testRestTemplate.exchange(
                     ENDPOINT + "/charge",
                     HttpMethod.POST,
-                    new HttpEntity<>(request),
+                    httpEntity,
                     responseType
             );
 
@@ -91,13 +97,20 @@ public class PointV1ApiE2ETest {
             );
             testRestTemplate.postForEntity(ENDPOINT_USER, userRequest, void.class);
 
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", "oyy11111");
+
+            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(1000L);
+
+            HttpEntity<PointV1Dto.ChargeRequest> httpEntity = new HttpEntity<>(chargeRequest, headers);
+
+            ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>>() {};
+
             // when
-            PointV1Dto.chargeRequest pointRequest = new PointV1Dto.chargeRequest("oyy11111", 1000L);
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.chargeResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.chargeResponse>>() {};
-            ResponseEntity<ApiResponse<PointV1Dto.chargeResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<PointV1Dto.ChargeResponse>> response = testRestTemplate.exchange(
                     ENDPOINT + "/charge",
                     HttpMethod.POST,
-                    new HttpEntity<>(pointRequest),
+                    httpEntity,
                     responseType
             );
 
@@ -130,11 +143,18 @@ public class PointV1ApiE2ETest {
             );
             testRestTemplate.postForEntity(ENDPOINT_USER, userRequest, void.class);
 
-            PointV1Dto.chargeRequest chargeRequest = new PointV1Dto.chargeRequest("oyy", 700L);
-            testRestTemplate.postForEntity(ENDPOINT + "/charge", chargeRequest, void.class);
-
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", "oyy");
+
+            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(700L);
+
+            HttpEntity<PointV1Dto.ChargeRequest> httpEntity = new HttpEntity<>(chargeRequest, headers);
+            testRestTemplate.exchange(
+                    ENDPOINT + "/charge",
+                    HttpMethod.POST,
+                    httpEntity,
+                    Void.class
+            );
 
             ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>> responseType = new ParameterizedTypeReference<ApiResponse<PointV1Dto.FindResponse>>() {};
 

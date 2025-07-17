@@ -14,13 +14,20 @@ public interface PointV1ApiSpec {
         summary = "포인트 충전",
         description = "포인트를 충전합니다."
     )
-    ApiResponse<PointV1Dto.chargeResponse> charge(
-        @RequestBody
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                description = "포인트 정보",
-                required = true
-        )
-        PointV1Dto.chargeRequest request
+    ApiResponse<PointV1Dto.ChargeResponse> charge(
+            @Parameter(
+                    name = "X-USER-ID",
+                    description = "유저 ID (헤더)",
+                    required = true
+            )
+            @RequestHeader("X-USER-ID") String userId,
+
+            @RequestBody
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "포인트 정보",
+                    required = true
+            )
+            PointV1Dto.ChargeRequest request
     );
 
     @Operation(
