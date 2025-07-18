@@ -11,9 +11,16 @@ public class UserFacade {
 
     private final UserService userService;
 
-    public UserInfo signUp(String userId, UserCommand command) {
+    public UserInfo signUp(UserCommand command) {
         // service
-        User user = userService.signUp(userId, command);
+        User user = userService.signUp(command);
+        // domain -> result
+        return UserInfo.from(user);
+    }
+
+    public UserInfo getMyInfo(String userId) {
+        // service
+        User user = userService.getMyInfo(userId);
         // domain -> result
         return UserInfo.from(user);
     }

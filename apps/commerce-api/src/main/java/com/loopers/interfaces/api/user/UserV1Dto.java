@@ -2,17 +2,21 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.UserCommand;
 import com.loopers.application.user.UserInfo;
+import com.loopers.domain.user.Gender;
+import jakarta.validation.constraints.NotNull;
 
 public class UserV1Dto {
 
     public record UserRequest(
-            String gender,
-            String birth,
-            String email
+            @NotNull String userId,
+            @NotNull Gender gender,
+            @NotNull String birth,
+            @NotNull String email
     ) {
 
         public static UserCommand toCommand(UserRequest request) {
             return new UserCommand(
+                    request.userId,
                     request.gender,
                     request.birth,
                     request.email
@@ -23,7 +27,7 @@ public class UserV1Dto {
 
     public record UserResponse(
             String userId,
-            String gender,
+            Gender gender,
             String birth,
             String email
     ) {
