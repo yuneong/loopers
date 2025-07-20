@@ -22,10 +22,11 @@ class PointTest {
         void throwsIllegalArgumentException_whenChargeAmountIsZeroOrNegative(long amount) {
             // given
             String userId = "oyy";
+            Point point = Point.create(userId);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                Point.charge(userId, amount);
+                point.charge(amount);
             });
         }
     }

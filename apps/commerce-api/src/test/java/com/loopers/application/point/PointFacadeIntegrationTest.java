@@ -1,8 +1,8 @@
 package com.loopers.application.point;
 
 import com.loopers.application.user.UserCommand;
+import com.loopers.application.user.UserFacade;
 import com.loopers.domain.user.Gender;
-import com.loopers.domain.user.UserService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -23,7 +23,7 @@ class PointFacadeIntegrationTest {
     private PointFacade pointFacade;
 
     @Autowired
-    private UserService userService;
+    private UserFacade userFacade;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -78,8 +78,7 @@ class PointFacadeIntegrationTest {
                     "1999-08-21",
                     "loopers@gmail.com"
             );
-            userService.signUp(command);
-            pointFacade.charge(new PointCommand("oyy", 500L));
+            userFacade.signUp(command);
 
             // when
             PointInfo pointInfo = pointFacade.getPoint(userId);

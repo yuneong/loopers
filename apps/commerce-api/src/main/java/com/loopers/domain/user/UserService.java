@@ -15,7 +15,7 @@ public class UserService {
     public User signUp(UserCommand command) {
         // validation existsByUserId
         String userId = command.userId();
-        if (existsByUserId(command.userId())) {
+        if (existsByUserId(userId)) {
             throw new IllegalArgumentException("User already exists with userId: " + userId);
         }
 
