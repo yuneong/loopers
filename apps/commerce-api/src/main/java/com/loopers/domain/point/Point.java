@@ -14,25 +14,39 @@ public class Point extends BaseEntity {
     private long amount;
     private long balance; // 총 보유 잔액
 
-    public static Point charge(
-            String userId,
-            long amount
-    ) {
+
+    public static Point create(String userId) {
         Point point = new Point();
 
-        // 유효성 검사
-        point.validateChargeAmount(amount);
-
         point.userId = userId;
-        point.amount = amount;
-        point.balance += amount; // 충전 시 잔액 증가
+        point.amount = 0L; // 초기 충전 금액
+        point.balance = 0L; // 초기 잔액
 
         return point;
     }
 
-    public void validateChargeAmount(long amount) {
+    public Point charge(long amount) {
+        validateAmount(amount, "charge");
+        this.balance += amount; // 충전 시 잔액 증가
+
+        return this;
+    }
+
+    public Point use(long amount) {
+        validateAmount(amount, "use");
+        if (this.balance < amount) {
+            throw new IllegalStateException("포인트가 부족합니다.");
+        }
+        this.balance -= amount;
+
+        return this;
+    }
+
+    public void validateAmount(long amount, String type) {
         if (amount <= 0L) {
-            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+            throw new IllegalArgumentException(
+                    String.format("%s 금액은 0보다 커야 합니다.", type.equals("charge") ? "충전" : "차감")
+            );
         }
     }
 

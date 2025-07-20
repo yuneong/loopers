@@ -14,7 +14,7 @@ public class PointRepositoryImpl implements PointRepository {
     private final PointJpaRepository pointJpaRepository;
 
     @Override
-    public Point charge(Point point) {
+    public Point save(Point point) {
         return pointJpaRepository.save(point);
     }
 
