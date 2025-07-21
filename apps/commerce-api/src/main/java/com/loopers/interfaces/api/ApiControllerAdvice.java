@@ -8,6 +8,8 @@ import com.loopers.support.error.ErrorType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -113,6 +115,26 @@ public class ApiControllerAdvice {
         return failureResponse(ErrorType.INTERNAL_ERROR, null);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> String.format("'%s' 필드: %s", error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(", "));
+
+        return failureResponse(ErrorType.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handleNullPoint(NullPointerException e) {
+        return failureResponse(ErrorType.NOT_FOUND, null);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ApiResponse<?>> handleMissingRequestHeader(MissingRequestHeaderException e) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(ErrorType.BAD_REQUEST.getCode(), e.getMessage()));
+    }
+
     private String extractMissingParameter(String message) {
         Pattern pattern = Pattern.compile("'(.+?)'");
         Matcher matcher = pattern.matcher(message);
@@ -123,4 +145,5 @@ public class ApiControllerAdvice {
         return ResponseEntity.status(errorType.getStatus())
             .body(ApiResponse.fail(errorType.getCode(), errorMessage != null ? errorMessage : errorType.getMessage()));
     }
+
 }

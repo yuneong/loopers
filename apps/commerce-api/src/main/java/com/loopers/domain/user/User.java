@@ -15,14 +15,14 @@ import java.time.format.DateTimeParseException;
 public class User extends BaseEntity {
 
     private String userId;
-    private String gender;
+    private Gender gender;
     private String birth;
     private String email;
 
     private String REGEX_USER_ID = "^[a-zA-Z0-9]{1,10}$";
     private String REGEX_EMAIL = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
-    public static User save(String userId, String gender, String birth, String email) {
+    public static User create(String userId, Gender gender, String birth, String email) {
         User user = new User();
 
         // 유효성 검사
@@ -49,7 +49,7 @@ public class User extends BaseEntity {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate birthDate = LocalDate.parse(birth, formatter);
 
-            if(!birthDate.isAfter(LocalDate.now())) {
+            if(birthDate.isAfter(LocalDate.now())) {
                 throw new IllegalArgumentException("생일은 오늘보다 미래의 날짜일 수 없습니다.");
             }
         } catch (DateTimeParseException e) {
