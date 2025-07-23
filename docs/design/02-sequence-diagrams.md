@@ -271,9 +271,55 @@ sequenceDiagram
 
 ---
 
-## 4. 상품 (Products) <-> 장바구니 (Carts)
+## 4. 유저 (Users) <-> 장바구니 (Carts)
 
+### ✅ 4-1. 장바구니 담기 요청
+```mermaid
+sequenceDiagram
+    actor User
+    participant CartController
+    participant CartFacade
+    participant CartService
+    participant ProductService
 
+    User->>CartController: POST /api/v1/carts
+    note right of User: Header: X-USER-ID: {userId}
+    alt X-USER-ID 헤더 ❌
+        CartController-->>User: 401 Unauthorized
+    end
+    
+    CartController->>CartFacade: addToCart(userId, cartItems)
+    CartFacade->>ProductService: checkProductAvailability(cartItems)
+    alt product 존재 ❌
+        ProductService-->>CartFacade: 404 Not Found
+    else productId 존재 ⭕️
+        CartFacade->>CartService: addToCart(userId, cartItems)
+        CartService-->>User: 201 Created + cartItemResponse
+    end
+```
+
+### ✅ 4-2. 내 장바구니 조회
+```mermaid
+sequenceDiagram
+    actor User
+    participant CartController
+    participant CartFacade
+    participant CartService
+    participant ProductService
+
+    User->>CartController: GET /api/v1/carts/me
+    note right of User: Header: X-USER-ID: {userId}
+    alt X-USER-ID 헤더 ❌
+        CartController-->>User: 401 Unauthorized
+    end
+    
+    CartController->>CartFacade: getCartItems(userId)
+    CartFacade->>CartService: getCartItems(userId)
+    CartService-->>CartFacade: cartItems
+
+    CartFacade->>ProductService: getProductDetails(cartItemIds)
+    ProductService-->>User: productDetails
+```
 
 
 
