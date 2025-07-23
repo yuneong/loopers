@@ -2,6 +2,85 @@
 
 ## 1. 유저 (Users) <-> 브랜드 & 상품 (Brands & Products)
 
+### ✅ 1-1. 브랜드 정보 조회
+```mermaid
+sequenceDiagram
+    actor User
+    participant BrandController
+    participant BrandFacade
+    participant BrandService
+
+    User->>BrandController: GET /api/v1/brands/{brandId}
+    alt brandId 존재 ❌
+        BrandController-->>User: 404 Not Found
+    end
+    
+    BrandController->>BrandService: getBrandDetail(brandId)
+    BrandService-->>User: brandDetail
+```
+
+### ✅ 1-2. GET /api/v1/products 상품 목록 조회
+```mermaid
+sequenceDiagram
+    actor User
+    participant ProductController
+    participant ProductFacade
+    participant ProductService
+    participant LikeService
+
+    %% /api/v1/products?brandId=1&sort=createdAt,desc&sort=price,asc&sort=likes,desc&page=0&size=20
+    User->>ProductController: GET /api/v1/products?brandId={}&sort={}&page={}&size={}
+    note right of User: Header: X-USER-ID: {userId}
+
+    alt 정렬 조건 ❌
+        alt default 정렬 적용
+            ProductController->>ProductFacade: getProductList(brandId, defaultPageable)
+        else 에러 반환
+            ProductController-->>User: 400 Bad Request
+        end
+    else 정렬 조건 ⭕️
+        ProductController->>ProductFacade: getProductList(brandId, pageable)
+        ProductFacade->>ProductService: getProducts(brandId, pageable)
+        ProductService-->>ProductFacade: productList
+
+        alt 로그인 (userId) ⭕️
+            ProductFacade->>LikeService: hasUserLikedProducts(userId, productList)
+            LikeService-->>ProductFacade: likedYnList
+            ProductFacade-->>User: productList + likedYnList
+        else 로그인 (userId) ❌
+            ProductFacade-->>User: productList
+        end
+    end
+```
+
+### ✅ 1-3. GET /api/v1/products/{productId} 상품 정보 조회
+```mermaid
+sequenceDiagram
+    actor User
+    participant ProductController
+    participant ProductFacade
+    participant ProductService
+    participant LikeService
+
+    User->>ProductController: GET /api/v1/products/{productId}
+    note right of User: Header: X-USER-ID: {userId}
+    alt productId ❌
+        ProductController-->>User: 404 Not Found
+    end
+    
+    ProductController->>ProductFacade: getProductDetail(productId)
+    ProductFacade->>ProductService: getProductDetail(productId)
+    ProductService-->>ProductFacade: productDetail
+
+    alt 로그인 (userId) ⭕️
+        ProductFacade->>LikeService: hasUserLikedProduct(userId, productId)
+        LikeService-->>ProductFacade: likedYn
+        ProductFacade-->>User: productDetail + likedYn
+    else 로그인 (userId) ❌
+        ProductFacade-->>User: productDetail
+    end
+```
+
 ---
 
 ## 2. 유저 (Users) <-> 좋아요 (Likes)
