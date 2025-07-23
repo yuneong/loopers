@@ -11,32 +11,43 @@
 sequenceDiagram
     actor User
     participant LikeController
+    participant LikeFacade
     participant LikeService
     participant ProductService
     participant LikeRepository
 
+    %% 좋아요 생성
     User->>LikeController: POST /api/v1/products/{productId}/likes
     note right of User: Header: X-USER-ID: {userId}
     alt X-USER-ID 헤더 ❌
         LikeController-->>User: 401 Unauthorized
     end
 
-    LikeController->>LikeService: toggleLike(userId, productId)
-    
-    LikeService->>LikeRepository: existsLike(userId, productId)
-    alt 좋아요 ❌ → 좋아요 등록
-        LikeService->>LikeRepository: save(userId, productId)
-        LikeService->>ProductService: incrementLikes(productId)
-        ProductService-->>LikeService: likeCount: N+1
-        LikeService-->>LikeController: { likedYn: Y, likeCount: N+1 }
-    else 좋아요 ⭕️ → 좋아요 삭제
-        LikeService->>LikeRepository: delete(userId, productId)
-        LikeService->>ProductService: decrementLikes(productId)
-        ProductService-->>LikeService: likeCount: N-1
-        LikeService-->>LikeController: { likedYn: N, likeCount: N-1 }
+    LikeController->>LikeFacade: like(userId, productId)
+    LikeFacade->>LikeService: like(userId, productId)
+    LikeService->>LikeRepository: update likedYn = 'Y' 
+    alt updatedRow == 0
+        LikeService->>LikeRepository: save(userId, productId, likedYn='Y')
+    end
+    LikeFacade->>ProductService: incrementLikes(productId)
+    ProductService->>LikeFacade: totalLikes
+    LikeFacade-->LikeController: { likedYn: Y, totalLikes }
+    LikeController-->>User: 200 OK + { likedYn: Y, totalLikes }
+
+    %% 좋아요 삭제
+    User->>LikeController: DELETE /api/v1/products/{productId}/likes
+    note right of User: Header: X-USER-ID: {userId}
+    alt X-USER-ID 헤더 ❌
+        LikeController-->>User: 401 Unauthorized
     end
 
-    LikeController-->>User: 200 OK + { likedYn, likeCount }
+    LikeController->>LikeFacade: unLike(userId, productId)
+    LikeFacade->>LikeService: unLike(userId, productId)
+    LikeService->>LikeRepository: update likedYn = 'N' 
+    LikeFacade->>ProductService: decrementLikes(productId)
+    ProductService->>LikeFacade: totalLikes
+    LikeFacade-->LikeController: { likedYn: N, totalLikes }
+    LikeController-->>User: 200 OK + { likedYn: N, totalLikes }
 ```
 
 ### ✅ 2-2. 내가 좋아요 한 상품 목록 조회
@@ -44,20 +55,27 @@ sequenceDiagram
 sequenceDiagram
     actor User
     participant LikeController
+    participant LikeFacade
     participant LikeService
     participant LikeRepository
     participant ProductService
    
-    User->>LikeController: GET /api/v1/users/{userId}/likes
+    User->>LikeController: GET /api/v1/users/me/likes
+    note right of User: Header: X-USER-ID: {userId}
+    alt X-USER-ID 헤더 ❌
+        LikeController-->>User: 401 Unauthorized
+    end
     
-    LikeController->>LikeService: getLikedProducts(userId)
+    LikeController->>LikeFacade: getLikedProducts(userId)
+    LikeFacade->>LikeService: getLikedProducts(userId)
     
     LikeService->>LikeRepository: findByUserId(userId)
-    LikeRepository-->>LikeService: likedProductIds
+    LikeRepository-->>LikeFacade: likedProductIds
     
-    LikeService->>ProductService: getProductsByIds(likedProductIds)
-    ProductService-->>LikeService: likedProductsDetail
+    LikeFacade->>ProductService: getProductsByIds(likedProductIds)
+    ProductService-->>LikeFacade: likedProductsDetail
     
+    LikeFacade-->>LikeController: likedProductsDetail
     LikeController-->>User: 200 OK + likedProductsDetail
 ```
 
