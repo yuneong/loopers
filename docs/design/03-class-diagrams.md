@@ -34,7 +34,7 @@ classDiagram
     class Order {
         -Long id
         -User user
-        -List<OrderItem> items
+        -List&lt;OrderItem&gt; items
         -int totalPrice
         +createOrder()
         +calculateTotalPrice()
@@ -50,7 +50,7 @@ classDiagram
     class Cart {
         -Long id
         -User user
-        -List<CartItem> items
+        -List&lt;CartItem&gt; items
         +addItem()
     }
 
@@ -136,7 +136,7 @@ classDiagram
     class Order {
         -Long id
         -User user
-        -List<OrderItem> items 
+        -List&lt;OrderItem&gt; items
         -int totalPrice
         -String status
         -DateTime orderedAt
@@ -175,7 +175,7 @@ classDiagram
     class Cart {
         -Long id
         -User user
-        -List<CartItem> items
+        -List&lt;CartItem&gt; items
     }
 
     class CartItem {
