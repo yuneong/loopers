@@ -172,11 +172,10 @@ sequenceDiagram
     participant CartService
     participant ProductService
     participant PointService
-    participant OrderRepository
     participant Order
     participant Stock
     participant Point
-    participant PaymentGateway
+    participant OMS(주문 정보 외부 시스템)
 
     User->>OrderController: POST /api/v1/orders
     note right of User: Header: X-USER-ID: {userId}
@@ -185,13 +184,13 @@ sequenceDiagram
     end
     
     OrderController->>OrderFacade: createOrder(userId, orderRequest)
-    
+
     OrderFacade->>CartService: getCartItems(userId, cartItemIds)
     CartService-->>OrderFacade: cartItems
 
     OrderFacade->>ProductService: checkProductStock(cartItems)
     alt 상품 재고 ❌
-        ProductService-->>CartService: 409 Conflict
+        ProductService-->>OrderFacade: 409 Conflict
     else 상품 재고 ⭕️
         OrderFacade->>PointService: checkUserPoints(userId, totalPrice)
         alt 포인트 보유 ❌
@@ -199,23 +198,24 @@ sequenceDiagram
         else 포인트 보유 ⭕️
             OrderFacade->>OrderService: createOrder(userId, cartItems, point, stocks)
 
-            OrderService->>Order: process()
+            OrderService->>Order: orderProcess()
 
             activate Order
-            Order->>Stock: decrease() 반복
+            Order->>Stock: stockDecrease()
             Stock-->>Order: ok
-            Order->>Point: use()
+            Order->>Point: pointUse()
             Point-->>Order: ok
+            Order-->>OrderService: orderResult
             deactivate Order
 
-            OrderService->>OrderRepository: save(order)
-
-            OrderService->>PaymentGateway: requestPayment(paymentRequest)
-            alt 결제 ❌
-                PaymentGateway-->>OrderService: 402 Payment Required
-            else 결제 ⭕️
-                OrderService->>CartService: clearCart(userId, cartItemIds)
-                OrderService-->>OrderController: 201 Created
+            OrderFacade->>OMS(주문 정보 외부 시스템): sendOrderInfo(order)
+            alt OMS(주문 정보 외부 시스템) ❌
+                OMS(주문 정보 외부 시스템)-->>OrderService: 500
+            else OMS(주문 정보 외부 시스템) ⭕️
+                OMS(주문 정보 외부 시스템)-->>OrderService: 200 OK
+                
+                OrderFacade->>CartService: clearCart(userId, cartItemIds)
+                CartService-->>OrderFacade: cartCleared
             end
         end
     end
@@ -230,7 +230,7 @@ sequenceDiagram
     participant OrderService
     participant ProductService
 
-    User->>OrderController: GET /api/v1/users/{userId}/orders
+    User->>OrderController: GET /api/v1/orders
     OrderController->>OrderFacade: getOrderList(userId)
     
     OrderFacade->>OrderService: getOrdersByUser(userId)
