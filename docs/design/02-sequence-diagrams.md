@@ -96,7 +96,7 @@ sequenceDiagram
     participant LikeRepository
 
     %% 좋아요 생성
-    User->>LikeController: POST /api/v1/products/{productId}/likes
+    User->>LikeController: POST /api/v1/likes/products/{productId}
     note right of User: Header: X-USER-ID: {userId}
     alt X-USER-ID 헤더 ❌
         LikeController-->>User: 401 Unauthorized
@@ -114,7 +114,7 @@ sequenceDiagram
     LikeController-->>User: 200 OK + { likedYn: Y, totalLikes }
 
     %% 좋아요 삭제
-    User->>LikeController: DELETE /api/v1/products/{productId}/likes
+    User->>LikeController: DELETE /api/v1/likes/products/{productId}
     note right of User: Header: X-USER-ID: {userId}
     alt X-USER-ID 헤더 ❌
         LikeController-->>User: 401 Unauthorized
@@ -139,7 +139,7 @@ sequenceDiagram
     participant LikeRepository
     participant ProductService
    
-    User->>LikeController: GET /api/v1/users/me/likes
+    User->>LikeController: GET /api/v1/likes/me
     note right of User: Header: X-USER-ID: {userId}
     alt X-USER-ID 헤더 ❌
         LikeController-->>User: 401 Unauthorized
