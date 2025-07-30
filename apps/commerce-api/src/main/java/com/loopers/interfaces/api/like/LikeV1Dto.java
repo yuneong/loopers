@@ -4,6 +4,7 @@ package com.loopers.interfaces.api.like;
 import com.loopers.application.like.LikeContent;
 import com.loopers.application.like.LikeInfo;
 import com.loopers.application.like.LikeListInfo;
+import com.loopers.domain.like.LikeStatus;
 import com.loopers.domain.product.Product;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class LikeV1Dto {
 
     public record LikeResponse(
-            String likedYn,
+            LikeStatus likedYn,
             Long likeCount
     ) {
         public static LikeResponse from(LikeInfo info) {
@@ -28,7 +29,7 @@ public class LikeV1Dto {
             String productImageUrl,
             int productPrice,
             Long likeCount,
-            String likedYn
+            LikeStatus likedYn
     ) {
         public static LikeContentResponse from(LikeContent content) {
             Product product = content.product();

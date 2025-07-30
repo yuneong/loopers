@@ -21,14 +21,16 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private String likedYn;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "liked_yn")
+    private LikeStatus likedYn;
 
     public void like() {
-        this.likedYn = "Y";
+        this.likedYn = LikeStatus.Y;
     }
 
     public void unLike() {
-        this.likedYn = "N";
+        this.likedYn = LikeStatus.N;
     }
 
     public static Like likeOrCreate(Optional<Like> maybeLike, User user, Product product) {
@@ -44,8 +46,12 @@ public class Like extends BaseEntity {
         Like like = new Like();
         like.user = user;
         like.product = product;
-        like.likedYn = "Y";
+        like.likedYn = LikeStatus.Y;
         return like;
+    }
+
+    public boolean isLiked() {
+        return this.likedYn.isLiked();
     }
 
 }
