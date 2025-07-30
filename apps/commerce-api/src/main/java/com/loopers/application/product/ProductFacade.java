@@ -31,8 +31,11 @@ public class ProductFacade {
 
         // 추후 여유가 생기면 구현 -> 로그인시 likedYn 추가
 
+        // product, likeCount mapping VO
+        ProductContentBundle bundle = ProductContentBundle.create(products, likeCounts);
+
         // domain -> result
-        return ProductListInfo.from(products, likeCounts);
+        return ProductListInfo.from(bundle, products.getPageable(), products.getTotalElements());
     }
 
     public ProductInfo getProductDetail(Long productId, String userId) {

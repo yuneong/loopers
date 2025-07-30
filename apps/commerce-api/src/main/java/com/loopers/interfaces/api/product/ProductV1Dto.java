@@ -3,7 +3,6 @@ package com.loopers.interfaces.api.product;
 import com.loopers.application.product.ProductContent;
 import com.loopers.application.product.ProductInfo;
 import com.loopers.application.product.ProductListInfo;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,7 +10,10 @@ public class ProductV1Dto {
 
     public record ProductListResponse(
             List<ProductContentResponse> contents,
-            Pageable pageable
+            int page,
+            int size,
+            long totalElements,
+            int totalPages
     ) {
         public static ProductListResponse from(ProductListInfo info) {
             List<ProductContentResponse> contentResponses = info.contents().stream()
@@ -20,7 +22,10 @@ public class ProductV1Dto {
 
             return new ProductListResponse(
                     contentResponses,
-                    info.pageable()
+                    info.page(),
+                    info.size(),
+                    info.totalElements(),
+                    info.totalPages()
             );
         }
     }
