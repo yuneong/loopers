@@ -31,14 +31,7 @@ public interface LikeJpaRepository extends JpaRepository<Like, Long> {
         """)
     Long countGroupByProductId(Long productId);
 
-    @Query("""
-            SELECT l
-            FROM Like l
-            WHERE l.product = :product
-                AND l.user = :user
-        """)
     Optional<Like> findByProductAndUser(Product product, User user);
-
 
     @Query("""
             SELECT l
