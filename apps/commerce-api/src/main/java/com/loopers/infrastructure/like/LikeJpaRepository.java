@@ -40,6 +40,13 @@ public interface LikeJpaRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByProductAndUser(Product product, User user);
 
 
-    List<Like> findByUser(User user);
+    @Query("""
+            SELECT l
+            FROM Like l
+            JOIN FETCH l.product p
+            WHERE l.user = :user
+                AND l.likedYn = 'Y'
+        """)
+    List<Like> findByUserJoinProduct(User user);
 
 }

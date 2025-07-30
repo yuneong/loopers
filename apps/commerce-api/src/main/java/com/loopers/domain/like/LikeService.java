@@ -50,7 +50,7 @@ public class LikeService {
     }
 
     public List<Like> getLikeProducts(User user) {
-        return likeRepository.findByUser(user);
+        return likeRepository.findByUserJoinProduct(user);
     }
 
 }

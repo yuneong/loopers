@@ -18,6 +18,6 @@ public interface LikeRepository {
 
     Like save(Like like);
 
-    List<Like> findByUser(User user);
+    List<Like> findByUserJoinProduct(User user);
 
 }

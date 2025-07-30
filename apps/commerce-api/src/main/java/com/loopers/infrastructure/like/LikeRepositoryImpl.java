@@ -38,8 +38,8 @@ public class LikeRepositoryImpl implements LikeRepository {
     }
 
     @Override
-    public List<Like> findByUser(User user) {
-        return likeJpaRepository.findByUser(user);
+    public List<Like> findByUserJoinProduct(User user) {
+        return likeJpaRepository.findByUserJoinProduct(user);
     }
 
 }

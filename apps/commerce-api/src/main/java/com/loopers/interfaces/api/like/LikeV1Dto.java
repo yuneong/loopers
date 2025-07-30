@@ -23,13 +23,20 @@ public class LikeV1Dto {
     }
 
     public record LikeContentResponse(
-            Product product,
+            Long productId,
+            String productName,
+            String productImageUrl,
+            int productPrice,
             Long likeCount,
             String likedYn
     ) {
         public static LikeContentResponse from(LikeContent content) {
+            Product product = content.product();
             return new LikeContentResponse(
-                    content.product(),
+                    product.getId(),
+                    product.getName(),
+                    product.getImageUrl(),
+                    product.getPrice(),
                     content.likeCount(),
                     content.likedYn()
             );
