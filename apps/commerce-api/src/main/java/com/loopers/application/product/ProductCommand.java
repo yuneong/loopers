@@ -23,7 +23,13 @@ public record ProductCommand(
     }
 
     public Pageable toPageable() {
-        return PageRequest.of(page, size, sort);
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 20 : size;
+        Sort safeSort = (sort == null || sort().isEmpty())
+                ? Sort.by(Sort.Direction.DESC, "createdAt")
+                : sort;
+
+        return PageRequest.of(safePage, safeSize, safeSort);
     }
 
     public ProductSearchCondition toCondition() {
