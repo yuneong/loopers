@@ -48,4 +48,9 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.save(product);
     }
 
+    @Override
+    public List<Product> findByAll() {
+        return productJpaRepository.findAll();
+    }
+
 }

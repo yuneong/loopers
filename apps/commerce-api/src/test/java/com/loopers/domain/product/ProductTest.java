@@ -133,4 +133,59 @@ class ProductTest {
         }
     }
 
+    @DisplayName("상품 재고 차감 시,")
+    @Nested
+    class DecreaseStock {
+
+        Brand dummyBrand = new Brand();
+
+        @DisplayName("재고가 충분하면 정상적으로 차감된다.")
+        @Test
+        void success_whenStockIsEnough() {
+            Product product = Product.create(
+                    dummyBrand,
+                    "상품명",
+                    "설명",
+                    "https://example.com/image.jpg",
+                    1000,
+                    10
+            );
+
+            product.decreaseStock(3);
+
+            assertEquals(7, product.getStock());
+        }
+
+        @DisplayName("0 이하의 수량을 차감하려 하면 예외가 발생한다.")
+        @ParameterizedTest
+        @ValueSource(ints = {0, -1, -5})
+        void throwsException_whenQuantityIsZeroOrNegative(int quantity) {
+            Product product = Product.create(
+                    dummyBrand,
+                    "상품명",
+                    "설명",
+                    "https://example.com/image.jpg",
+                    1000,
+                    10
+            );
+
+            assertThrows(IllegalArgumentException.class, () -> product.decreaseStock(quantity));
+        }
+
+        @DisplayName("차감할 수량이 현재 재고보다 많으면 예외가 발생한다.")
+        @Test
+        void throwsException_whenStockIsInsufficient() {
+            Product product = Product.create(
+                    dummyBrand,
+                    "상품명",
+                    "설명",
+                    "https://example.com/image.jpg",
+                    1000,
+                    5
+            );
+
+            assertThrows(IllegalStateException.class, () -> product.decreaseStock(10));
+        }
+    }
+
 }
