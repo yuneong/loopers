@@ -1,5 +1,7 @@
 package com.loopers.domain.point;
 
+import com.loopers.domain.user.Gender;
+import com.loopers.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,8 +23,8 @@ class PointTest {
         @ValueSource(longs = {0L, -100L, -1L})
         void throwsIllegalArgumentException_whenChargeAmountIsZeroOrNegative(long amount) {
             // given
-            String userId = "oyy";
-            Point point = Point.create(userId);
+            User user = User.create("oyy", Gender.F, "1999-08-21", "loopers@gmail.com");
+            Point point = Point.create(user);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
