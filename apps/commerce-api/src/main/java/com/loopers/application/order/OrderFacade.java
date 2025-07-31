@@ -28,7 +28,7 @@ public class OrderFacade {
     public OrderInfo placeOrder(OrderCommand command) {
         // 유저, 포인트 조회
         User user = userService.getMyInfo(command.userId());
-        Point point = pointService.getPoint(command.userId());
+        Point point = pointService.getPoint(user);
 
         // 상품 조회
         List<Long> productIds = command.items().stream()

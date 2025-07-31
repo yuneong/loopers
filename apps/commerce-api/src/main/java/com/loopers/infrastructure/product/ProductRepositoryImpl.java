@@ -43,4 +43,9 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.findAllById(productIds);
     }
 
+    @Override
+    public Product save(Product product) {
+        return productJpaRepository.save(product);
+    }
+
 }
