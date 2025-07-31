@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,11 @@ public class ProductService {
         return productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("Product not found with id: " + productId)
         );
+    }
+
+    public List<Product> getProductsByIds(List<Long> productIds) {
+        // repository
+        return productRepository.findAllById(productIds);
     }
 
 }

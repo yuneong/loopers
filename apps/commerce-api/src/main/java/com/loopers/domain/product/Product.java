@@ -63,4 +63,15 @@ public class Product extends BaseEntity {
             throw new IllegalArgumentException("재고는 0 초과이어야 합니다.");
     }
 
+
+    public void decreaseStock(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("차감할 재고 수량은 0보다 커야 합니다.");
+        }
+        if (this.stock < quantity) {
+            throw new IllegalStateException("재고가 부족합니다.");
+        }
+        this.stock -= quantity;
+    }
+
 }
