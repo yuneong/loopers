@@ -27,9 +27,9 @@ public class PointService {
     @Transactional
     public Point charge(PointCommand command) {
         // validation point exists for userId
-        String userId = command.userId();
-        Point point = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Point not found for userId: " + userId));
+        User user = userRepository.findByUserId(command.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with userId: " + command.userId()));
+        Point point = pointRepository.findByUser(user);
 
         // command -> domain
         point.charge(command.amount());
@@ -37,9 +37,9 @@ public class PointService {
         return pointRepository.save(point);
     }
 
-    public Point getPoint(String userId) {
+    public Point getPoint(User user) {
         // repository
-        return pointRepository.findByUserId(userId).orElse(null);
+        return pointRepository.findByUser(user);
     }
 
 }

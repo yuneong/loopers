@@ -2,6 +2,7 @@ package com.loopers.application.point;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointService;
+import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -29,7 +30,8 @@ public class PointFacade {
 
     public PointInfo getPoint(String userId) {
         // service
-        Point point = pointService.getPoint(userId);
+        User user = userService.getMyInfo(userId);
+        Point point = pointService.getPoint(user);
         if (point == null) {
             return null;
         }
