@@ -52,10 +52,10 @@ class CartServiceIntegrationTest {
         savedBrand = brandRepository.save(brand);
     }
 
-//    @AfterEach
-//    void cleanDatabase() {
-//        databaseCleanUp.truncateAllTables();
-//    }
+    @AfterEach
+    void cleanDatabase() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @DisplayName("장바구니 담기 시,")
     @Nested
