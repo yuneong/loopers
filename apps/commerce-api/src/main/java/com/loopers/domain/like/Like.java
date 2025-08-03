@@ -13,7 +13,7 @@ import java.util.Optional;
 @Table(name = "likes")
 public class Like extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade =  CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 

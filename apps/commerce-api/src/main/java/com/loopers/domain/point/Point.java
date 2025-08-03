@@ -10,7 +10,7 @@ import lombok.Getter;
 @Table(name = "points")
 public class Point extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
     private long amount;
