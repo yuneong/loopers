@@ -4,16 +4,18 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.user.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
 
 @Entity
 @Getter
 @Table(name = "likes")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like extends BaseEntity {
 
-    @OneToOne(cascade =  CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -33,20 +35,13 @@ public class Like extends BaseEntity {
         this.likedYn = LikeStatus.N;
     }
 
-    public static Like likeOrCreate(Optional<Like> maybeLike, User user, Product product) {
-        if (maybeLike.isPresent()) {
-            Like existingLike = maybeLike.get();
-            existingLike.like();
-            return existingLike;
-        }
-        return Like.create(user, product);
-    }
-
     public static Like create(User user, Product product) {
         Like like = new Like();
+
         like.user = user;
         like.product = product;
         like.likedYn = LikeStatus.Y;
+
         return like;
     }
 

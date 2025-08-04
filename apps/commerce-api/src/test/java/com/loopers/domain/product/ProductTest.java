@@ -1,6 +1,7 @@
 package com.loopers.domain.product;
 
 import com.loopers.domain.brand.Brand;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductTest {
 
+    Brand dummyBrand = TestFixture.createBrand();
+
     @DisplayName("상품 생성 시,")
     @Nested
     class CreateProduct {
-
-        Brand dummyBrand = new Brand();
 
         @DisplayName("브랜드가 null이면 예외가 발생한다")
         @Test
@@ -53,10 +54,9 @@ class ProductTest {
             );
         }
 
-        @DisplayName("가격이 0 이하이면 예외가 발생한다.")
+        @DisplayName("가격이 음수이면 예외가 발생한다.")
         @ParameterizedTest
         @ValueSource(ints = {
-                0,
                 -1,
                 -100
         })
@@ -136,8 +136,6 @@ class ProductTest {
     @DisplayName("상품 재고 차감 시,")
     @Nested
     class DecreaseStock {
-
-        Brand dummyBrand = new Brand();
 
         @DisplayName("재고가 충분하면 정상적으로 차감된다.")
         @Test

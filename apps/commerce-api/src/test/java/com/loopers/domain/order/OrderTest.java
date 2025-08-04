@@ -2,6 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.product.Product;
 import com.loopers.domain.user.User;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OrderTest {
 
+    User user = TestFixture.createUser();
+    Product product = TestFixture.createProduct(TestFixture.createBrand());
+
     @DisplayName("place()")
     @Nested
     class placeOrder {
@@ -20,8 +24,6 @@ class OrderTest {
         @Test
         void success() {
             // given
-            User user = new User();
-            Product product = new Product();
             OrderItem item1 = OrderItem.create(product, 1, 1000);
             OrderItem item2 = OrderItem.create(product, 1, 2000);
 
@@ -41,9 +43,6 @@ class OrderTest {
         @DisplayName("주문 아이템이 null이면 예외가 발생한다.")
         @Test
         void throwsException_whenItemsNull() {
-            // given
-            User user = new User();
-
             // when & then
             assertThrows(IllegalArgumentException.class, () -> Order.place(user, null));
         }
@@ -52,7 +51,6 @@ class OrderTest {
         @Test
         void throwsException_whenUserIsNull() {
             // given
-            Product product = new Product();
             OrderItem item = OrderItem.create(product, 1, 1000);
 
             // when & then
@@ -62,9 +60,6 @@ class OrderTest {
         @DisplayName("주문 아이템이 빈 리스트이면 예외가 발생한다.")
         @Test
         void throwsException_whenItemsEmpty() {
-            // given
-            User user = new User();
-
             // when & then
             assertThrows(IllegalArgumentException.class, () -> Order.place(user, List.of()));
         }
@@ -80,7 +75,6 @@ class OrderTest {
         void success() {
             // given
             Order order = new Order();
-            Product product = new Product();
             OrderItem item = OrderItem.create(product, 1, 1500);
 
             // when
@@ -113,7 +107,6 @@ class OrderTest {
         void success() {
             // given
             Order order = new Order();
-            Product product = new Product();
             OrderItem item1 = OrderItem.create(product, 1, 1000);
             OrderItem item2 = OrderItem.create(product, 1, 2000);
             order.addItem(item1);

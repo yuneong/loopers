@@ -33,4 +33,16 @@ public class ProductService {
         return productRepository.findAllById(productIds);
     }
 
+    public List<Product> checkAndDecreaseStock(List<ProductQuantity> productQuantities) {
+        for (ProductQuantity pq : productQuantities) {
+            pq.decreaseQuantity(pq.getQuantity());
+        }
+
+        List<Product> products = productQuantities.stream()
+                        .map(ProductQuantity::getProduct)
+                        .toList();
+
+        return productRepository.saveAll(products);
+    }
+
 }

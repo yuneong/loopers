@@ -3,12 +3,12 @@ package com.loopers.domain.order;
 import com.loopers.application.order.OrderItemCommand;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.support.TestFixture;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,9 +36,6 @@ class OrderServiceIntegrationTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private PointRepository pointRepository;
-
-    @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
     private User savedUser;
@@ -48,10 +44,10 @@ class OrderServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        User user = new User();
+        User user = TestFixture.createUser();
         savedUser = userRepository.save(user);
 
-        Brand brand = new Brand();
+        Brand brand = TestFixture.createBrand();
         savedBrand = brandRepository.save(brand);
     }
 
@@ -78,56 +74,22 @@ class OrderServiceIntegrationTest {
             );
             Product savedProduct = productRepository.save(product);
 
-            Point point = Point.create(savedUser);
-            point.charge(50000);
-            Point savedPoint = pointRepository.save(point);
-
             OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 2, 10000);
             List<OrderItemCommand> commands = List.of(command);
 
             // when
-            Order order = orderService.createOrder(commands, savedUser, savedPoint, List.of(savedProduct));
+            Order order = orderService.createOrder(commands, savedUser, List.of(savedProduct));
 
             // then
             assertAll(
                     () -> assertThat(order.getOrderItems()).hasSize(1),
-                    () -> assertThat(order.getTotalPrice()).isEqualTo(20000),
-                    () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID),
-                    () -> assertThat(savedProduct.getStock()).isEqualTo(8),
-                    () -> assertThat(savedPoint.getBalance()).isEqualTo(30000)
+                    () -> assertThat(order.getTotalPrice()).isEqualTo(20000)
             );
         }
 
-        @DisplayName("재고가 부족하면 예외가 발생한다.")
+        @DisplayName("user가 null이면 예외가 발생한다.")
         @Test
-        void createOrder_fail_dueToInsufficientStock() {
-            // given
-            Product product = Product.create(
-                    savedBrand,
-                    "상품명",
-                    "상품설명",
-                    "https://example.com/image.jpg",
-                    10000,
-                    1
-            );
-            Product savedProduct = productRepository.save(product);
-
-            Point point = Point.create(savedUser);
-            point.charge(50000);
-            Point savedPoint = pointRepository.save(point);
-
-            OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 2, 10000);
-            List<OrderItemCommand> commands = List.of(command);
-
-            // when & then
-            assertThrows(IllegalStateException.class, () -> {
-                orderService.createOrder(commands, savedUser, savedPoint, List.of(savedProduct));
-            });
-        }
-
-        @DisplayName("포인트가 부족하면 예외가 발생한다.")
-        @Test
-        void createOrder_fail_dueToInsufficientPoint() {
+        void createOrder_fail_dueToNullUser() {
             // given
             Product product = Product.create(
                     savedBrand,
@@ -139,20 +101,82 @@ class OrderServiceIntegrationTest {
             );
             Product savedProduct = productRepository.save(product);
 
-            Point point = Point.create(savedUser);
-            point.charge(20000);
-            Point savedPoint = pointRepository.save(point);
-
-            OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 5, 10000);
+            OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 2, 10000);
             List<OrderItemCommand> commands = List.of(command);
 
             // when & then
-            assertThrows(IllegalStateException.class, () -> {
-                orderService.createOrder(commands, savedUser, savedPoint, List.of(savedProduct));
+            assertThrows(NullPointerException.class, () -> {
+                orderService.createOrder(commands, null, List.of(savedProduct));
+            });
+        }
+
+        @DisplayName("주문 아이템이 비어있으면 예외가 발생한다.")
+        @Test
+        void createOrder_fail_dueToEmptyCommands() {
+            // given
+            Product product = Product.create(
+                    savedBrand,
+                    "상품명",
+                    "상품설명",
+                    "https://example.com/image.jpg",
+                    10000,
+                    10
+            );
+            Product savedProduct = productRepository.save(product);
+
+            List<OrderItemCommand> commands = List.of(); // 빈 리스트
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                orderService.createOrder(commands, savedUser, List.of(savedProduct));
+            });
+        }
+    }
+
+    @DisplayName("주문 저장 시,")
+    @Nested
+    class saveOrder {
+
+        @DisplayName("정상적으로 저장되고 상태가 PAID로 변경된다.")
+        @Test
+        void saveOrder_success() {
+            // given
+            Product product = Product.create(
+                    savedBrand,
+                    "상품명",
+                    "상품설명",
+                    "https://example.com/image.jpg",
+                    10000,
+                    10
+            );
+            Product savedProduct = productRepository.save(product);
+
+            OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 2, 10000);
+            List<OrderItemCommand> commands = List.of(command);
+
+            Order order = orderService.createOrder(commands, savedUser, List.of(savedProduct));
+
+            // when
+            Order savedOrder = orderService.saveOrder(order);
+
+            // then
+            assertAll(
+                    () -> assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.PAID),
+                    () -> assertThat(savedOrder.getId()).isNotNull()
+            );
+        }
+
+        @DisplayName("order가 null이면 예외가 발생한다.")
+        @Test
+        void saveOrder_fail_whenOrderIsNull() {
+            // when & then
+            assertThrows(NullPointerException.class, () -> {
+                orderService.saveOrder(null);
             });
         }
 
     }
+
 
     @DisplayName("주문 목록 조회 시,")
     @Nested
@@ -172,12 +196,9 @@ class OrderServiceIntegrationTest {
             );
             Product savedProduct = productRepository.save(product);
 
-            Point point = Point.create(savedUser);
-            point.charge(20000);
-            Point savedPoint = pointRepository.save(point);
-
             OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 1, 10000);
-            orderService.createOrder(List.of(command), savedUser, savedPoint, List.of(savedProduct));
+            Order order = orderService.createOrder(List.of(command), savedUser, List.of(savedProduct));
+            orderService.saveOrder(order);
 
             // when
             List<Order> orders = orderService.getOrders(savedUser);
@@ -217,12 +238,8 @@ class OrderServiceIntegrationTest {
             );
             Product savedProduct = productRepository.save(product);
 
-            Point point = Point.create(savedUser);
-            point.charge(20000);
-            Point savedPoint = pointRepository.save(point);
-
             OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 1, 10000);
-            Order order = orderService.createOrder(List.of(command), savedUser, savedPoint, List.of(savedProduct));
+            Order order = orderService.saveOrder(orderService.createOrder(List.of(command), savedUser, List.of(savedProduct)));
 
             // when
             Order found = orderService.getOrderDetail(order.getId(), savedUser);
@@ -231,21 +248,20 @@ class OrderServiceIntegrationTest {
             assertThat(found.getId()).isEqualTo(order.getId());
         }
 
-        @DisplayName("존재하지 않는 주문 ID로 조회하면 null을 반환한다.")
+        @DisplayName("존재하지 않는 주문 ID로 조회하면 null을 반환한다.(예외 발생)")
         @Test
         void orderNotFound() {
-            // when
-            Order found = orderService.getOrderDetail(-1L, savedUser);
-
-            // then
-            assertThat(found).isNull();
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                orderService.getOrderDetail(-1L, savedUser);
+            });
         }
 
-        @DisplayName("다른 유저의 주문을 조회하면 null을 반환한다.")
+        @DisplayName("다른 유저의 주문을 조회하면 null을 반환한다.(예외 발생)")
         @Test
         void wrongUser() {
             // given
-            User savedUser2 = userRepository.save(new User());
+            User savedUser2 = userRepository.save(User.create("oyy2", Gender.F, "1999-01-01", "loopers@gmail.com"));
 
             Product product = Product.create(
                     savedBrand,
@@ -257,18 +273,13 @@ class OrderServiceIntegrationTest {
             );
             Product savedProduct = productRepository.save(product);
 
-            Point point = Point.create(savedUser);
-            point.charge(20000);
-            Point savedPoint = pointRepository.save(point);
-
             OrderItemCommand command = new OrderItemCommand(savedProduct.getId(), 1, 10000);
-            Order order = orderService.createOrder(List.of(command), savedUser, savedPoint, List.of(savedProduct));
+            Order order = orderService.saveOrder(orderService.createOrder(List.of(command), savedUser, List.of(savedProduct)));
 
-            // when
-            Order found = orderService.getOrderDetail(order.getId(), savedUser2);
-
-            // then
-            assertThat(found).isNull();
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                orderService.getOrderDetail(order.getId(), savedUser2);
+            });
         }
 
     }

@@ -3,7 +3,9 @@ package com.loopers.domain.order;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

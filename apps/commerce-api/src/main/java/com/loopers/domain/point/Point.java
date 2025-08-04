@@ -3,17 +3,20 @@ package com.loopers.domain.point;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "points")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Point extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-    private long amount;
+//    private long amount;
     private long balance; // 총 보유 잔액
 
 
@@ -21,7 +24,7 @@ public class Point extends BaseEntity {
         Point point = new Point();
 
         point.user = user;
-        point.amount = 0L; // 초기 충전 금액
+//        point.amount = 0L; // 초기 충전 금액
         point.balance = 0L; // 초기 잔액
 
         return point;
@@ -44,7 +47,7 @@ public class Point extends BaseEntity {
         return this;
     }
 
-    public void validateAmount(long amount, String type) {
+    private void validateAmount(long amount, String type) {
         if (amount <= 0L) {
             throw new IllegalArgumentException(
                     String.format("%s 금액은 0보다 커야 합니다.", type.equals("charge") ? "충전" : "차감")

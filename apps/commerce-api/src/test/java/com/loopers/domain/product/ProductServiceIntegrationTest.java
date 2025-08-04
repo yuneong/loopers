@@ -285,4 +285,55 @@ class ProductServiceIntegrationTest {
 
     }
 
+    @DisplayName("상품 재고 차감 시,")
+    @Nested
+    class CheckAndDecreaseStock {
+
+        @DisplayName("재고가 충분하면 정상적으로 차감된다.")
+        @Test
+        void successToDecreaseStock() {
+            // given
+            Product product = productRepository.findByAll().get(0); // 재고 10
+            ProductQuantity pq = ProductQuantity.of(product, 3);
+            List<ProductQuantity> quantities = List.of(pq);
+
+            // when
+            List<Product> updated = productService.checkAndDecreaseStock(quantities);
+
+            // then
+            assertAll(
+                    () -> assertThat(updated).hasSize(1),
+                    () -> assertThat(updated.get(0).getStock()).isEqualTo(7)
+            );
+        }
+
+        @DisplayName("차감 수량이 0 이하이면 예외가 발생한다.")
+        @Test
+        void failToDecreaseStock_whenQuantityIsZeroOrNegative() {
+            // given
+            Product product = productRepository.findByAll().get(1); // 재고 10
+            ProductQuantity pq = ProductQuantity.of(product, 0); // 0은 예외 대상
+            List<ProductQuantity> quantities = List.of(pq);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                productService.checkAndDecreaseStock(quantities);
+            });
+        }
+
+        @DisplayName("차감 수량이 현재 재고보다 많으면 예외가 발생한다.")
+        @Test
+        void failToDecreaseStock_whenInsufficientStock() {
+            // given
+            Product product = productRepository.findByAll().get(2); // 재고 10
+            ProductQuantity pq = ProductQuantity.of(product, 15); // 수량 > 재고
+            List<ProductQuantity> quantities = List.of(pq);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> {
+                productService.checkAndDecreaseStock(quantities);
+            });
+        }
+    }
+
 }

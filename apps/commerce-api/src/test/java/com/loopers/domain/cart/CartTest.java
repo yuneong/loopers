@@ -3,6 +3,7 @@ package com.loopers.domain.cart;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.user.User;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CartTest {
 
+    User dummyUser = TestFixture.createUser();
+
     @DisplayName("create()")
     @Nested
     class CreateCart {
@@ -22,16 +25,13 @@ class CartTest {
         @DisplayName("사용자 정보가 있으면 장바구니 생성에 성공한다.")
         @Test
         void success() {
-            // given
-            User user = new User();
-
             // when
-            Cart cart = Cart.create(user);
+            Cart cart = Cart.create(dummyUser);
 
             // then
             assertNotNull(cart);
             assertNotNull(cart.getId());
-            assertEquals(user, cart.getUser());
+            assertEquals(dummyUser, cart.getUser());
         }
 
         @DisplayName("사용자 정보가 null이면 예외가 발생한다.")
@@ -46,7 +46,7 @@ class CartTest {
     @Nested
     class AddItem {
 
-        Brand dummyBrand = new Brand();
+        Brand dummyBrand = TestFixture.createBrand();
         Product product = Product.create(
                 dummyBrand,
                 "상품명",
@@ -60,7 +60,7 @@ class CartTest {
         @Test
         void success() {
             // given
-            Cart cart = Cart.create(new User());
+            Cart cart = Cart.create(dummyUser);
             CartItem item1 = CartItem.create(product, 2, 1000);
             CartItem item2 = CartItem.create(product, 1, 2000);
 
@@ -79,7 +79,7 @@ class CartTest {
         @NullAndEmptySource
         void failWhenInvalidList(List<CartItem> input) {
             // given & when
-            Cart cart = Cart.create(new User());
+            Cart cart = Cart.create(dummyUser);
 
             // then
             assertThrows(IllegalArgumentException.class, () -> cart.addItem(input));
@@ -89,7 +89,7 @@ class CartTest {
         @Test
         void failWhenItemIsNull() {
             // given
-            Cart cart = Cart.create(new User());
+            Cart cart = Cart.create(dummyUser);
             CartItem item = null;
 
             // when & then

@@ -2,6 +2,7 @@ package com.loopers.domain.cart;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CartItemTest {
 
+    Brand dummyBrand = TestFixture.createBrand();
+
     @DisplayName("CartItem 생성 시,")
     @Nested
     class CreateCartItem {
-
-        Brand dummyBrand = new Brand();
 
         @DisplayName("성공한다.")
         @Test

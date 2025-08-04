@@ -1,10 +1,12 @@
 package com.loopers.application.order;
 
+import com.loopers.application.product.ProductQuantityFactory;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductQuantity;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
@@ -36,7 +38,20 @@ public class OrderFacade {
                 .toList();
         List<Product> products = productService.getProductsByIds(productIds);
 
-        Order order = orderService.createOrder(command.items(), user, point, products);
+        // 주문 생성
+        Order order = orderService.createOrder(command.items(), user, products);
+        int totalPrice = order.calculateTotalPrice();
+
+        List<ProductQuantity> productQuantities = ProductQuantityFactory.createFrom(command.items(), products);
+
+        // 상품 재고 차감 (검증 포함)
+        productService.checkAndDecreaseStock(productQuantities);
+
+        // 포인트 차감 (검증 포함)
+        pointService.checkAndUsePoint(point, totalPrice);
+
+        // 주문 저장
+        orderService.saveOrder(order);
 
         // 임시 가정 응답
         // 주문 정보 외부 시스템 전송

@@ -18,7 +18,7 @@ public class UserFacade {
         User user = userService.signUp(command);
 
         // create Point for new user
-        pointService.create(user.getUserId());
+        pointService.create(user);
 
         // domain -> result
         return UserInfo.from(user);

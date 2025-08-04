@@ -2,22 +2,21 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.product.Product;
 import com.loopers.domain.user.User;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LikeTest {
 
+    User user = TestFixture.createUser();
+    Product product = TestFixture.createProduct(TestFixture.createBrand());
+
     @DisplayName("Like 생성 시 likedYn은 Y 상태이다.")
     @Test
     void createLike() {
-        // given
-        User user = new User();
-        Product product = new Product();
-
         // when
         Like like = Like.create(user, product);
 
@@ -57,39 +56,6 @@ class LikeTest {
         assertThat(like.getLikedYn()).isEqualTo(LikeStatus.N);
     }
 
-    @DisplayName("likeOrCreate - 기존 Like가 있으면 상태만 Y로 바꾼다.")
-    @Test
-    void likeOrCreate_whenExistingLike() {
-        // given
-        Like existing = new Like();
-        existing.unLike();
-
-        // when
-        Like result = Like.likeOrCreate(Optional.of(existing), null, null);
-
-        // then
-        assertThat(result).isSameAs(existing); // 기존 객체와 동일한지 확인
-        assertThat(result.isLiked()).isTrue();
-        assertThat(result.getLikedYn()).isEqualTo(LikeStatus.Y);
-    }
-
-    @DisplayName("likeOrCreate - 기존 Like가 없으면 새 Like를 생성한다.")
-    @Test
-    void likeOrCreate_whenNoLike() {
-        // given
-        User user = new User();
-        Product product = new Product();
-
-        // when
-        Like result = Like.likeOrCreate(Optional.empty(), user, product);
-
-        // then
-        assertThat(result.getUser()).isEqualTo(user);
-        assertThat(result.getProduct()).isEqualTo(product);
-        assertThat(result.isLiked()).isTrue();
-        assertThat(result.getLikedYn()).isEqualTo(LikeStatus.Y);
-    }
-
     @DisplayName("like()가 여러 번 호출되어도 상태는 Y로 유지된다.")
     @Test
     void like_isIdempotent() {
@@ -121,6 +87,5 @@ class LikeTest {
         assertThat(like.isLiked()).isFalse();
         assertThat(like.getLikedYn()).isEqualTo(LikeStatus.N);
     }
-
 
 }

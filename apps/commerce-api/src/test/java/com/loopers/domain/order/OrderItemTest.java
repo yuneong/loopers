@@ -2,6 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
+import com.loopers.support.TestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class OrderItemTest {
     @Nested
     class CreateOrderItem {
 
-        Brand dummyBrand = new Brand();
+        Brand dummyBrand = TestFixture.createBrand();
 
         @DisplayName("성공한다.")
         @Test

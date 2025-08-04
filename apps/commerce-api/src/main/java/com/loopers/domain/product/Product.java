@@ -3,11 +3,14 @@ package com.loopers.domain.product;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "products")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,13 +59,12 @@ public class Product extends BaseEntity {
         if (!imageUrl.matches("^https?://.*\\.(jpg|jpeg|png|gif|webp|svg)$"))
             throw new IllegalArgumentException("유효한 이미지 확장자를 가진 URL이어야 합니다.");
 
-        if (price <= 0)
-            throw new IllegalArgumentException("가격은 0 초과이어야 합니다.");
+        if (price < 0)
+            throw new IllegalArgumentException("가격은 0보다 커야 합니다.");
 
         if (stock <= 0)
             throw new IllegalArgumentException("재고는 0 초과이어야 합니다.");
     }
-
 
     public void decreaseStock(int quantity) {
         if (quantity <= 0) {

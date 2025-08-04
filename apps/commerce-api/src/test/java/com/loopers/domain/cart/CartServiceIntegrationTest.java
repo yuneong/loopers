@@ -8,6 +8,7 @@ import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.support.TestFixture;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,10 +45,10 @@ class CartServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        User user = new User();
+        User user = TestFixture.createUser();
         savedUser = userRepository.save(user);
 
-        Brand brand = new Brand();
+        Brand brand = TestFixture.createBrand();
         savedBrand = brandRepository.save(brand);
     }
 
