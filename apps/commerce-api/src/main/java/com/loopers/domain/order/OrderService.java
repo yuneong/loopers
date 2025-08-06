@@ -1,8 +1,5 @@
 package com.loopers.domain.order;
 
-import com.loopers.application.order.OrderItemCommand;
-import com.loopers.application.order.OrderItemFactory;
-import com.loopers.domain.product.Product;
 import com.loopers.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,13 +13,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public Order createOrder(
-            List<OrderItemCommand> itemCommands,
             User user,
-            List<Product> products
+            List<OrderItem> items,
+            DiscountedOrderByCoupon discountedOrderByCoupon
     ) {
-        List<OrderItem> items = OrderItemFactory.createFrom(itemCommands, products);
-
-        return Order.place(user, items);
+        return Order.place(user, items, discountedOrderByCoupon);
     }
 
     public Order saveOrder(Order order) {

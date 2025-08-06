@@ -31,7 +31,7 @@ public record OrderInfo(
         return new OrderInfo(
                 order.getId(),
                 order.getUser().getUserId(),
-                order.getTotalPrice(),
+                order.getTotalPrice().intValue(),
                 order.getStatus(),
                 itemInfos,
                 externalSendInfo
