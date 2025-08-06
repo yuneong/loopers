@@ -2,13 +2,16 @@ package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
 @Entity
 @Getter
 @Table(name = "user_coupons")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserCoupon extends BaseEntity {
 
     private String userId;
@@ -18,7 +21,25 @@ public class UserCoupon extends BaseEntity {
     private Long couponId;
     private UserCouponStatus status = UserCouponStatus.AVAILABLE;
     private ZonedDateTime usedAt;
-    private ZonedDateTime expiredAt;
+    private ZonedDateTime expiredAt; // 만료일
+
+    public UserCoupon(String userId, Long couponId, UserCouponStatus status, ZonedDateTime usedAt, ZonedDateTime expiredAt) {
+        this.userId = userId;
+        this.couponId = couponId;
+        this.status = status;
+        this.usedAt = usedAt;
+        this.expiredAt = expiredAt;
+    }
+
+    public static UserCoupon create(String userId, Long couponId, ZonedDateTime expiredAt) {
+        UserCoupon userCoupon = new UserCoupon();
+
+        userCoupon.userId = userId;
+        userCoupon.couponId = couponId;
+        userCoupon.expiredAt = expiredAt;
+
+        return userCoupon;
+    }
 
     public void use() {
         validate();

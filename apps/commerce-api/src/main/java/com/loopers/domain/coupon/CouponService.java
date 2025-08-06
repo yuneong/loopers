@@ -4,6 +4,7 @@ import com.loopers.domain.order.DiscountedOrderByCoupon;
 import com.loopers.domain.order.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,6 +18,7 @@ public class CouponService {
     private final UserCouponRepository userCouponRepository;
     private final DiscountStrategyFactory discountStrategyFactory;
 
+    @Transactional
     public DiscountedOrderByCoupon useCoupon(String userId, Long couponId, List<OrderItem> items) {
         // 쿠폰 적용 전 총 금액
         int totalPrice = items.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
