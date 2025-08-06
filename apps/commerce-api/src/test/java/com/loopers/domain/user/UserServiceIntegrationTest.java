@@ -113,18 +113,16 @@ class UserServiceIntegrationTest {
             );
         }
 
-        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.(예외 발생)")
         @Test
         void returnsNull_whenUserDoesNotExist() {
             // given
             String userId = UUID.randomUUID().toString(); // 존재하지 않을만한 ID 생성
 
-            // when
-            User findUser = userService.getMyInfo(userId);
-
-            // then
-            assertThat(findUser).isNull();
-            assertThat(findUser).isEqualTo(null);
+            // when & then
+            assertThrows(NullPointerException.class, () -> {
+                userService.getMyInfo(userId);
+            });
         }
     }
 

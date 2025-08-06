@@ -1,6 +1,6 @@
 package com.loopers.domain.point;
 
-import com.loopers.application.point.PointCommand;
+import com.loopers.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,29 +11,42 @@ public class PointService {
 
     private final PointRepository pointRepository;
 
-    public Point create(String userId) {
+    @Transactional
+    public Point create(User user) {
         // create new Point
-        Point point = Point.create(userId);
+        Point point = Point.create(user);
         // repository
         return pointRepository.save(point);
     }
 
     @Transactional
-    public Point charge(PointCommand command) {
+    public Point charge(User user, Long amount) {
         // validation point exists for userId
-        String userId = command.userId();
-        Point point = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Point not found for userId: " + userId));
-
+        Point point = getExistingPoint(user);
         // command -> domain
-        point.charge(command.amount());
+        point.charge(amount);
         // repository
         return pointRepository.save(point);
     }
 
-    public Point getPoint(String userId) {
+    public Point getPoint(User user) {
         // repository
-        return pointRepository.findByUserId(userId).orElse(null);
+        return getExistingPoint(user);
+    }
+
+    public Point checkAndUsePoint(Point point, int totalPrice) {
+        // 포인트 차감
+        point.use(totalPrice);
+        // 저장
+        return pointRepository.save(point);
+    }
+
+    public Point getExistingPoint(User user) {
+        Point point = pointRepository.findByUser(user);
+        if (point == null) {
+            throw new IllegalArgumentException("Point not found for user: " + user.getUserId());
+        }
+        return point;
     }
 
 }

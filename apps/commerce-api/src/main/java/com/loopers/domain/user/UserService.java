@@ -20,7 +20,7 @@ public class UserService {
         }
 
         // command -> domain
-        User user = UserCommand.toDomain(command);
+        User user = User.create(command.userId(), command.gender(), command.birth(), command.email());
         // repository
         return userRepository.save(user);
     }
@@ -30,7 +30,8 @@ public class UserService {
     }
 
     public User getMyInfo(String userId) {
-        return userRepository.findByUserId(userId).orElse(null);
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new NullPointerException("User not found with userId: " + userId));
     }
 
 }

@@ -3,7 +3,9 @@ package com.loopers.domain.user;
 import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +14,7 @@ import java.time.format.DateTimeParseException;
 @Entity
 @Getter
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     private String userId;
@@ -58,7 +61,7 @@ public class User extends BaseEntity {
     }
 
     public void validateEmail(String email) {
-        if (!email.matches(REGEX_EMAIL)) {
+        if (email == null || !email.matches(REGEX_EMAIL)) {
             throw new IllegalArgumentException("이메일 형식은 xx@yy.zz 이어야 합니다.");
         }
     }

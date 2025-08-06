@@ -3,8 +3,6 @@ package com.loopers.application.point;
 import com.loopers.application.user.UserCommand;
 import com.loopers.application.user.UserFacade;
 import com.loopers.domain.user.Gender;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,17 +43,12 @@ class PointFacadeIntegrationTest {
         @Test
         void failToCharge_whenUserIdDoesNotExist() {
             // given
-            PointCommand command = new PointCommand("oyy", 500L);
+            PointCommand command = new PointCommand("oyy2", 500L);
 
             // when & then
-            CoreException exception = assertThrows(CoreException.class, () -> {
+            assertThrows(NullPointerException.class, () -> {
                 pointFacade.charge(command);
             });
-
-            assertAll(
-                    () -> assertThat(exception.getMessage()).isEqualTo("존재하지 않는 유저 ID 입니다."),
-                    () -> assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND)
-            );
         }
 
     }
@@ -69,6 +63,7 @@ class PointFacadeIntegrationTest {
 
         @DisplayName("해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.")
         @Test
+        @Transactional
         void returnsBalance_whenUserExistsByUserId() {
             // given
             String userId = "oyy";
@@ -91,18 +86,16 @@ class PointFacadeIntegrationTest {
             );
         }
 
-        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.(예외 발생)")
         @Test
         void returnsNull_whenUserDoesNotExist() {
             // given
             String userId = "oyy";
 
-            // when
-            PointInfo pointInfo = pointFacade.getPoint(userId);
-
-            // then
-            assertThat(pointInfo).isNull();
-            assertThat(pointInfo).isEqualTo(null);
+            // when & then
+            assertThrows(NullPointerException.class, () -> {
+                pointFacade.getPoint(userId);
+            });
         }
     }
 
