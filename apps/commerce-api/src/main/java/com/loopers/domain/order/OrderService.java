@@ -3,6 +3,7 @@ package com.loopers.domain.order;
 import com.loopers.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,14 +13,18 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
+    @Transactional
     public Order createOrder(
             User user,
             List<OrderItem> items,
             DiscountedOrderByCoupon discountedOrderByCoupon
     ) {
-        return Order.place(user, items, discountedOrderByCoupon);
+        Order order = Order.place(user, items, discountedOrderByCoupon);
+
+        return orderRepository.save(order);
     }
 
+    @Transactional
     public Order saveOrder(Order order) {
         // 주문 상태 변경
         order.updateOrderStatus(OrderStatus.PAID);
