@@ -12,7 +12,8 @@ public record OrderInfo(
         int totalPrice,
         OrderStatus orderStatus,
         List<OrderItemInfo> items,
-        ExternalSendInfo externalSendInfo
+        ExternalSendInfo externalSendInfo,
+        Long couponId
 ) {
 
     public static OrderInfo from(
@@ -34,7 +35,8 @@ public record OrderInfo(
                 order.getTotalPrice().intValue(),
                 order.getStatus(),
                 itemInfos,
-                externalSendInfo
+                externalSendInfo,
+                order.getCouponId()
         );
     }
 

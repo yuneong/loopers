@@ -63,6 +63,7 @@ public class OrderFacade {
         return OrderInfo.from(order, extInfo);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderInfo> getOrders(String userId) {
         // 유저 정보 조회
         User user = userService.getMyInfo(userId);

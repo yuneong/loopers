@@ -29,6 +29,8 @@ public class Product extends BaseEntity {
 
     String status;
 
+    @Version
+    private Long version;
 
     public static Product create(Brand brand, String name, String description, String imageUrl, int price, int stock) {
         Product product = new Product();

@@ -22,6 +22,7 @@ public class UserCoupon extends BaseEntity {
     private UserCouponStatus status = UserCouponStatus.AVAILABLE;
     private ZonedDateTime usedAt;
     private ZonedDateTime expiredAt; // 만료일
+    @Version private Long version;
 
     public UserCoupon(String userId, Long couponId, UserCouponStatus status, ZonedDateTime usedAt, ZonedDateTime expiredAt) {
         this.userId = userId;
@@ -44,8 +45,8 @@ public class UserCoupon extends BaseEntity {
     public void use() {
         validate();
 
-        status = UserCouponStatus.USED;
-        usedAt = ZonedDateTime.now();
+        this.status = UserCouponStatus.USED;
+        this.usedAt = ZonedDateTime.now();
     }
 
     public void validate() {
