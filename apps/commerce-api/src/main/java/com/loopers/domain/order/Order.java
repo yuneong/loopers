@@ -27,13 +27,13 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    BigDecimal totalPrice;
+    private BigDecimal totalPrice;
 
-    OrderStatus status;
+    private OrderStatus status;
 
-    ZonedDateTime paidAt;
+    private ZonedDateTime paidAt;
 
-    Long couponId;
+    private Long couponId;
 
     public static Order place(User user, List<OrderItem> items, DiscountedOrderByCoupon discountedOrderByCoupon) {
         Order order = new Order();

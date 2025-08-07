@@ -15,19 +15,19 @@ public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
-    Brand brand;
+    private Brand brand;
 
-    String name;
+    private String name;
 
-    String description;
+    private String description;
 
-    String imageUrl;
+    private String imageUrl;
 
-    int price;
+    private int price;
 
-    int stock;
+    private int stock;
 
-    String status;
+    private String status;
 
     @Version
     private Long version;
